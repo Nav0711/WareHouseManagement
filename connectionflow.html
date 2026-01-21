@@ -1,0 +1,135 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:0.1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:0.1" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  
+  <!-- Title -->
+  <text x="400" y="30" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">
+    Frontend ↔ Backend ↔ Database Connection Flow
+  </text>
+  
+  <!-- Frontend Box -->
+  <rect x="50" y="80" width="200" height="180" fill="#667eea" rx="10" opacity="0.9"/>
+  <text x="150" y="110" font-size="16" font-weight="bold" text-anchor="middle" fill="white">
+    FRONTEND
+  </text>
+  <text x="150" y="135" font-size="12" text-anchor="middle" fill="white">
+    (Lovable/React)
+  </text>
+  
+  <!-- Frontend Components -->
+  <rect x="70" y="150" width="160" height="25" fill="white" rx="5" opacity="0.9"/>
+  <text x="150" y="168" font-size="11" text-anchor="middle" fill="#333">Component.tsx</text>
+  
+  <rect x="70" y="185" width="160" height="25" fill="white" rx="5" opacity="0.9"/>
+  <text x="150" y="203" font-size="11" text-anchor="middle" fill="#333">useWarehouses()</text>
+  
+  <rect x="70" y="220" width="160" height="25" fill="white" rx="5" opacity="0.9"/>
+  <text x="150" y="238" font-size="11" text-anchor="middle" fill="#333">api.ts (Client)</text>
+  
+  <!-- Arrow 1: Frontend to Backend -->
+  <path d="M 250 180 L 320 180" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <text x="285" y="165" font-size="10" text-anchor="middle" fill="#333">HTTP POST</text>
+  <text x="285" y="178" font-size="9" text-anchor="middle" fill="#666">/api/v1/warehouses</text>
+  
+  <!-- Backend Box -->
+  <rect x="320" y="80" width="200" height="300" fill="#764ba2" rx="10" opacity="0.9"/>
+  <text x="420" y="110" font-size="16" font-weight="bold" text-anchor="middle" fill="white">
+    BACKEND
+  </text>
+  <text x="420" y="135" font-size="12" text-anchor="middle" fill="white">
+    (FastAPI)
+  </text>
+  
+  <!-- Backend Components -->
+  <rect x="340" y="150" width="160" height="25" fill="white" rx="5" opacity="0.9"/>
+  <text x="420" y="168" font-size="11" text-anchor="middle" fill="#333">main.py (FastAPI App)</text>
+  
+  <rect x="340" y="185" width="160" height="25" fill="white" rx="5" opacity="0.9"/>
+  <text x="420" y="203" font-size="11" text-anchor="middle" fill="#333">api/warehouses.py</text>
+  
+  <rect x="340" y="220" width="160" height="25" fill="white" rx="5" opacity="0.9"/>
+  <text x="420" y="238" font-size="11" text-anchor="middle" fill="#333">services/</text>
+  
+  <rect x="340" y="255" width="160" height="25" fill="white" rx="5" opacity="0.9"/>
+  <text x="420" y="273" font-size="11" text-anchor="middle" fill="#333">repositories/</text>
+  
+  <rect x="340" y="290" width="160" height="25" fill="white" rx="5" opacity="0.9"/>
+  <text x="420" y="308" font-size="11" text-anchor="middle" fill="#333">database.py (Pool)</text>
+  
+  <rect x="340" y="325" width="160" height="40" fill="white" rx="5" opacity="0.9"/>
+  <text x="420" y="340" font-size="10" text-anchor="middle" fill="#333">SQL Query:</text>
+  <text x="420" y="355" font-size="9" text-anchor="middle" fill="#666">INSERT INTO warehouses...</text>
+  
+  <!-- Arrow 2: Backend to Database -->
+  <path d="M 520 230 L 580 230" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <text x="550" y="220" font-size="10" text-anchor="middle" fill="#333">SQL</text>
+  
+  <!-- Database Box -->
+  <rect x="580" y="80" width="170" height="300" fill="#10b981" rx="10" opacity="0.9"/>
+  <text x="665" y="110" font-size="16" font-weight="bold" text-anchor="middle" fill="white">
+    DATABASE
+  </text>
+  <text x="665" y="135" font-size="12" text-anchor="middle" fill="white">
+    (PostgreSQL/Neon)
+  </text>
+  
+  <!-- Database Tables -->
+  <rect x="600" y="155" width="130" height="20" fill="white" rx="3" opacity="0.9"/>
+  <text x="665" y="170" font-size="10" text-anchor="middle" fill="#333">warehouses</text>
+  
+  <rect x="600" y="180" width="130" height="20" fill="white" rx="3" opacity="0.9"/>
+  <text x="665" y="195" font-size="10" text-anchor="middle" fill="#333">products</text>
+  
+  <rect x="600" y="205" width="130" height="20" fill="white" rx="3" opacity="0.9"/>
+  <text x="665" y="220" font-size="10" text-anchor="middle" fill="#333">inventory</text>
+  
+  <rect x="600" y="230" width="130" height="20" fill="white" rx="3" opacity="0.9"/>
+  <text x="665" y="245" font-size="10" text-anchor="middle" fill="#333">orders</text>
+  
+  <rect x="600" y="255" width="130" height="20" fill="white" rx="3" opacity="0.9"/>
+  <text x="665" y="270" font-size="10" text-anchor="middle" fill="#333">shipments</text>
+  
+  <rect x="600" y="290" width="130" height="70" fill="white" rx="5" opacity="0.9"/>
+  <text x="665" y="310" font-size="11" font-weight="bold" text-anchor="middle" fill="#10b981">✓ ACID</text>
+  <text x="665" y="325" font-size="9" text-anchor="middle" fill="#333">Atomic</text>
+  <text x="665" y="338" font-size="9" text-anchor="middle" fill="#333">Consistent</text>
+  <text x="665" y="351" font-size="9" text-anchor="middle" fill="#333">Isolated</text>
+  
+  <!-- Return arrows -->
+  <path d="M 580 270 L 520 270" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#arrowhead2)"/>
+  <text x="550" y="285" font-size="9" text-anchor="middle" fill="#10b981">Returns Data</text>
+  
+  <path d="M 320 220 L 250 220" stroke="#764ba2" stroke-width="2" fill="none" marker-end="url(#arrowhead3)"/>
+  <text x="285" y="235" font-size="9" text-anchor="middle" fill="#764ba2">JSON Response</text>
+  
+  <!-- Example Flow -->
+  <rect x="50" y="420" width="700" height="150" fill="white" rx="10" stroke="#333" stroke-width="2"/>
+  <text x="400" y="445" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">
+    Example: User Creates Warehouse
+  </text>
+  
+  <text x="70" y="470" font-size="11" fill="#333">1. User clicks "Create Warehouse" button</text>
+  <text x="70" y="490" font-size="11" fill="#667eea">2. Frontend: api.createWarehouse() called</text>
+  <text x="70" y="510" font-size="11" fill="#764ba2">3. Backend: POST /api/v1/warehouses → SQL INSERT</text>
+  <text x="70" y="530" font-size="11" fill="#10b981">4. Database: Saves row, returns warehouse_id=5</text>
+  <text x="70" y="550" font-size="11" fill="#333">5. UI updates immediately with new warehouse!</text>
+  
+  <!-- Arrow definitions -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#333" />
+    </marker>
+    <marker id="arrowhead2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#10b981" />
+    </marker>
+    <marker id="arrowhead3" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#764ba2" />
+    </marker>
+  </defs>
+</svg>
