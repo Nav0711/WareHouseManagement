@@ -19,15 +19,22 @@ class Settings(BaseSettings):
     
     # API
     API_V1_PREFIX: str = "/api/v1"
-    CORS_ORIGINS: list = ["http://localhost:3000", "http://localhost:5173"]
+    
+    # CORS - Allow your Lovable frontend
+    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
     
     # Security (if implementing authentication later)
     SECRET_KEY: str = "your-secret-key-change-in-production"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-    
+        
     class Config:
         env_file = ".env"
         case_sensitive = True
+    
+    @property
+    def cors_origins_list(self) -> list:
+        """Convert comma-separated CORS origins to list"""
+        return [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
 
 
 @lru_cache()

@@ -21,6 +21,18 @@ __pycache__/
 *.pyo
 *.pyd
 *.pyc
+*.pyo
+.Python
+
+# ==============================
+# Node.js / Frontend
+# ==============================
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vite/
+build/
 
 # ==============================
 # Databases / local state
@@ -33,14 +45,13 @@ instance/
 # Logs
 # ==============================
 *.log
+logs/
 
 # ==============================
 # Distribution / packaging
 # ==============================
-.Python
 build/
 develop-eggs/
-dist/
 downloads/
 eggs/
 .eggs/
@@ -61,6 +72,7 @@ share/python-wheels/
 .coverage.*
 htmlcov/
 .pytest_cache/
+.vitest/
 
 # ==============================
 # FastAPI / Uvicorn
@@ -80,8 +92,19 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+*.swn
+*.sublime-workspace
+*.sublime-project
 
 # ==============================
-# Node / frontend leftovers (safety)
+# Alembic
 # ==============================
-node_modules/
+alembic/versions/
+
+# ==============================
+# Miscellaneous
+# ==============================
+.cache/
+.sass-cache/
+tmp/
+temp/

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from typing import List, Optional
-from app.databse import get_db, Database
+from app.database import get_db, Database
 from app.repositories.inventory_repositories import InventoryRepository
 from app.models.inventory import (
     InventoryWithDetails, InventoryResponse,

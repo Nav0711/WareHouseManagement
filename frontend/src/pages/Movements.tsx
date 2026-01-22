@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, ArrowDownLeft, ArrowUpRight, ArrowLeftRight } from 'lucide-react';
+import { Plus, ArrowDownLeft, ArrowUpRight, ArrowLeftRight, Loader2, AlertTriangle } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { DataTable } from '@/components/ui/data-table';
 import { Button } from '@/components/ui/button';
@@ -21,25 +21,9 @@ import {
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
-interface Movement {
-  id: string;
-  type: 'inbound' | 'outbound' | 'transfer';
-  product: string;
-  quantity: number;
-  fromLocation: string;
-  toLocation: string;
-  timestamp: string;
-  createdBy: string;
-}
-
-const movementsData: Movement[] = [
-  { id: '1', type: 'inbound', product: 'Widget Pro Max', quantity: 500, fromLocation: 'Supplier A', toLocation: 'Central Hub - Zone A', timestamp: '2025-01-21 14:32', createdBy: 'John D.' },
-  { id: '2', type: 'outbound', product: 'Standard Gadget', quantity: 120, fromLocation: 'West Coast DC - Zone B', toLocation: 'Customer #1234', timestamp: '2025-01-21 13:15', createdBy: 'Sarah M.' },
-  { id: '3', type: 'transfer', product: 'Premium Package', quantity: 200, fromLocation: 'Central Hub - Zone C', toLocation: 'Midwest Center - Zone A', timestamp: '2025-01-21 11:45', createdBy: 'Mike R.' },
-  { id: '4', type: 'inbound', product: 'Basic Component', quantity: 1000, fromLocation: 'Supplier B', toLocation: 'Southern Hub - Zone D', timestamp: '2025-01-21 10:20', createdBy: 'Emily S.' },
-  { id: '5', type: 'outbound', product: 'Industrial Tool', quantity: 50, fromLocation: 'Northeast DC - Zone A', toLocation: 'Customer #5678', timestamp: '2025-01-21 09:00', createdBy: 'John D.' },
-];
+import { useMovements } from '@/hooks/useMovements';
+import { StockMovement } from '@/lib/api';
+import { format } from 'date-fns';
 
 const typeConfig = {
   inbound: { icon: ArrowDownLeft, color: 'bg-success/10 text-success border-success/20', label: 'Inbound' },
@@ -50,13 +34,14 @@ const typeConfig = {
 export default function Movements() {
   const [isOpen, setIsOpen] = useState(false);
   const [movementType, setMovementType] = useState<string>('');
+  const { movements, loading, error } = useMovements();
 
   const columns = [
     {
       key: 'type',
       header: 'Type',
-      render: (row: Movement) => {
-        const config = typeConfig[row.type];
+      render: (row: StockMovement) => {
+        const config = typeConfig[row.movement_type];
         const Icon = config.icon;
         return (
           <Badge variant="outline" className={`gap-1.5 ${config.color}`}>
@@ -66,23 +51,72 @@ export default function Movements() {
         );
       },
     },
-    { key: 'product', header: 'Product' },
+    { 
+      key: 'product', 
+      header: 'Product',
+      render: (row: StockMovement) => (
+        <div>
+          <p className="font-medium">{row.product_name || `Product #${row.product_id}`}</p>
+          {row.product_code && (
+            <p className="text-sm text-muted-foreground font-mono">{row.product_code}</p>
+          )}
+        </div>
+      ),
+    },
     {
       key: 'quantity',
       header: 'Quantity',
-      render: (row: Movement) => row.quantity.toLocaleString(),
+      render: (row: StockMovement) => row.quantity.toLocaleString(),
     },
-    { key: 'fromLocation', header: 'From' },
-    { key: 'toLocation', header: 'To' },
+    { 
+      key: 'from', 
+      header: 'From',
+      render: (row: StockMovement) => row.from_warehouse_name || '-',
+    },
+    { 
+      key: 'to', 
+      header: 'To',
+      render: (row: StockMovement) => row.to_warehouse_name || '-',
+    },
     {
       key: 'timestamp',
       header: 'Timestamp',
-      render: (row: Movement) => (
-        <span className="text-sm text-muted-foreground">{row.timestamp}</span>
+      render: (row: StockMovement) => (
+        <span className="text-sm text-muted-foreground">
+          {format(new Date(row.created_at), 'yyyy-MM-dd HH:mm')}
+        </span>
       ),
     },
-    { key: 'createdBy', header: 'Created By' },
+    { 
+      key: 'createdBy', 
+      header: 'Created By',
+      render: (row: StockMovement) => row.created_by || '-',
+    },
   ];
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
+            <p className="text-muted-foreground">Failed to load movements</p>
+            <p className="text-sm text-destructive mt-2">{error}</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -121,29 +155,28 @@ export default function Movements() {
                   </Select>
                 </div>
                 <div className="grid gap-2">
-                  <Label>Product</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select product" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="wpm">Widget Pro Max</SelectItem>
-                      <SelectItem value="sg">Standard Gadget</SelectItem>
-                      <SelectItem value="pp">Premium Package</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label>Product ID</Label>
+                  <Input type="number" placeholder="Enter product ID" />
                 </div>
                 <div className="grid gap-2">
                   <Label>Quantity</Label>
                   <Input type="number" placeholder="Enter quantity" />
                 </div>
+                {(movementType === 'outbound' || movementType === 'transfer') && (
+                  <div className="grid gap-2">
+                    <Label>From Warehouse ID</Label>
+                    <Input type="number" placeholder="Source warehouse" />
+                  </div>
+                )}
+                {(movementType === 'inbound' || movementType === 'transfer') && (
+                  <div className="grid gap-2">
+                    <Label>To Warehouse ID</Label>
+                    <Input type="number" placeholder="Destination warehouse" />
+                  </div>
+                )}
                 <div className="grid gap-2">
-                  <Label>From Location</Label>
-                  <Input placeholder="Source location" />
-                </div>
-                <div className="grid gap-2">
-                  <Label>To Location</Label>
-                  <Input placeholder="Destination location" />
+                  <Label>Reference Number (optional)</Label>
+                  <Input placeholder="e.g., PO-12345" />
                 </div>
               </div>
               <div className="flex justify-end gap-2">
@@ -159,7 +192,7 @@ export default function Movements() {
         </div>
 
         <div className="animate-slide-up opacity-0" style={{ animationDelay: '0.2s' }}>
-          <DataTable columns={columns} data={movementsData} />
+          <DataTable columns={columns} data={movements} />
         </div>
       </div>
     </DashboardLayout>

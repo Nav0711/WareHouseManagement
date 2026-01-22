@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { AlertTriangle, Filter } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { AlertTriangle, Filter, Loader2 } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { DataTable } from '@/components/ui/data-table';
 import { Button } from '@/components/ui/button';
@@ -12,81 +12,101 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-
-interface InventoryItem {
-  id: string;
-  product: string;
-  sku: string;
-  warehouse: string;
-  quantity: number;
-  minStock: number;
-  category: string;
-}
-
-const inventoryData: InventoryItem[] = [
-  { id: '1', product: 'Widget Pro Max', sku: 'WPM-001', warehouse: 'Central Hub', quantity: 1250, minStock: 500, category: 'Electronics' },
-  { id: '2', product: 'Standard Gadget', sku: 'SG-042', warehouse: 'West Coast DC', quantity: 89, minStock: 200, category: 'Electronics' },
-  { id: '3', product: 'Premium Package', sku: 'PP-103', warehouse: 'Central Hub', quantity: 3400, minStock: 1000, category: 'Packaging' },
-  { id: '4', product: 'Basic Component', sku: 'BC-205', warehouse: 'Midwest Center', quantity: 45, minStock: 100, category: 'Components' },
-  { id: '5', product: 'Industrial Tool', sku: 'IT-301', warehouse: 'Southern Hub', quantity: 780, minStock: 250, category: 'Tools' },
-  { id: '6', product: 'Office Supply Kit', sku: 'OSK-412', warehouse: 'Northeast DC', quantity: 2100, minStock: 500, category: 'Office' },
-  { id: '7', product: 'Safety Equipment', sku: 'SE-508', warehouse: 'Central Hub', quantity: 15, minStock: 50, category: 'Safety' },
-];
-
-const warehouses = ['All Warehouses', 'Central Hub', 'West Coast DC', 'Midwest Center', 'Southern Hub', 'Northeast DC'];
-const categories = ['All Categories', 'Electronics', 'Packaging', 'Components', 'Tools', 'Office', 'Safety'];
+import { useInventory } from '@/hooks/useInventory';
+import { useWarehouses } from '@/hooks/useWarehouses';
+import { InventoryWithDetails } from '@/lib/api';
 
 export default function Inventory() {
-  const [warehouseFilter, setWarehouseFilter] = useState('All Warehouses');
-  const [categoryFilter, setCategoryFilter] = useState('All Categories');
+  const [warehouseFilter, setWarehouseFilter] = useState<string>('all');
+  const { warehouses } = useWarehouses();
+  
+  const selectedWarehouseId = warehouseFilter !== 'all' ? Number(warehouseFilter) : undefined;
+  const { inventory, loading, error } = useInventory(selectedWarehouseId);
 
-  const filteredInventory = inventoryData.filter((item) => {
-    const matchesWarehouse = warehouseFilter === 'All Warehouses' || item.warehouse === warehouseFilter;
-    const matchesCategory = categoryFilter === 'All Categories' || item.category === categoryFilter;
-    return matchesWarehouse && matchesCategory;
-  });
+  const warehouseOptions = useMemo(() => {
+    return [{ id: 'all', name: 'All Warehouses' }, ...warehouses.map(w => ({ 
+      id: w.warehouse_id.toString(), 
+      name: w.warehouse_name 
+    }))];
+  }, [warehouses]);
 
   const columns = [
     {
       key: 'product',
       header: 'Product',
-      render: (row: InventoryItem) => (
+      render: (row: InventoryWithDetails) => (
         <div>
-          <p className="font-medium">{row.product}</p>
-          <p className="text-sm text-muted-foreground font-mono">{row.sku}</p>
+          <p className="font-medium">{row.product_name}</p>
+          <p className="text-sm text-muted-foreground font-mono">{row.product_code}</p>
         </div>
       ),
     },
-    { key: 'warehouse', header: 'Warehouse' },
-    { key: 'category', header: 'Category' },
+    { 
+      key: 'warehouse_name', 
+      header: 'Warehouse',
+      render: (row: InventoryWithDetails) => row.warehouse_name,
+    },
     {
       key: 'quantity',
       header: 'Quantity',
-      render: (row: InventoryItem) => (
+      render: (row: InventoryWithDetails) => (
         <div className="flex items-center gap-2">
-          <span className={cn(row.quantity < row.minStock && 'text-destructive font-medium')}>
+          <span className={cn(row.available_quantity < 50 && 'text-destructive font-medium')}>
             {row.quantity.toLocaleString()}
           </span>
-          {row.quantity < row.minStock && (
+          {row.available_quantity < 50 && (
             <AlertTriangle className="h-4 w-4 text-destructive animate-pulse" />
           )}
         </div>
       ),
     },
     {
+      key: 'available_quantity',
+      header: 'Available',
+      render: (row: InventoryWithDetails) => row.available_quantity.toLocaleString(),
+    },
+    {
+      key: 'reserved_quantity',
+      header: 'Reserved',
+      render: (row: InventoryWithDetails) => row.reserved_quantity.toLocaleString(),
+    },
+    {
       key: 'status',
       header: 'Stock Status',
-      render: (row: InventoryItem) => {
-        const ratio = row.quantity / row.minStock;
-        if (ratio < 0.5) {
-          return <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">Critical</Badge>;
-        } else if (ratio < 1) {
+      render: (row: InventoryWithDetails) => {
+        if (row.available_quantity <= 0) {
+          return <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">Out of Stock</Badge>;
+        } else if (row.available_quantity < 50) {
           return <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">Low</Badge>;
         }
         return <Badge variant="outline" className="bg-success/10 text-success border-success/20">Normal</Badge>;
       },
     },
   ];
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
+            <p className="text-muted-foreground">Failed to load inventory</p>
+            <p className="text-sm text-destructive mt-2">{error}</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -107,29 +127,16 @@ export default function Inventory() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {warehouses.map((w) => (
-                <SelectItem key={w} value={w}>{w}</SelectItem>
+              {warehouseOptions.map((w) => (
+                <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>
               ))}
             </SelectContent>
           </Select>
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-48">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map((c) => (
-                <SelectItem key={c} value={c}>{c}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {(warehouseFilter !== 'All Warehouses' || categoryFilter !== 'All Categories') && (
+          {warehouseFilter !== 'all' && (
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => {
-                setWarehouseFilter('All Warehouses');
-                setCategoryFilter('All Categories');
-              }}
+              onClick={() => setWarehouseFilter('all')}
             >
               Clear filters
             </Button>
@@ -137,7 +144,7 @@ export default function Inventory() {
         </div>
 
         <div className="animate-slide-up opacity-0" style={{ animationDelay: '0.3s' }}>
-          <DataTable columns={columns} data={filteredInventory} />
+          <DataTable columns={columns} data={inventory} />
         </div>
       </div>
     </DashboardLayout>

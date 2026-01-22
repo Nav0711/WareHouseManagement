@@ -1,5 +1,5 @@
 from typing import List, Optional
-from app.databse import Database
+from app.database import Database
 from app.models.inventory import (
     InventoryCreate, InventoryUpdate, InventoryResponse, InventoryWithDetails,
     StockMovementInbound, StockMovementOutbound, StockMovementTransfer,

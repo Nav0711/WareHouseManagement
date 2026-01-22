@@ -1,37 +1,64 @@
-import { Warehouse, AlertTriangle, Package, ArrowLeftRight } from 'lucide-react';
+import { Warehouse, AlertTriangle, Package, ArrowLeftRight, Loader2 } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { KPICard } from '@/components/dashboard/KPICard';
 import { UtilizationChart } from '@/components/dashboard/UtilizationChart';
 import { MovementTrendChart } from '@/components/dashboard/MovementTrendChart';
-
-const kpiData = [
-  {
-    title: 'Total Warehouses',
-    value: 12,
-    change: { value: 8.2, trend: 'up' as const },
-    icon: <Warehouse className="h-6 w-6" />,
-  },
-  {
-    title: 'Low Stock Alerts',
-    value: 23,
-    change: { value: 12.5, trend: 'down' as const },
-    icon: <AlertTriangle className="h-6 w-6" />,
-  },
-  {
-    title: 'Total Inventory Items',
-    value: '45.2K',
-    change: { value: 5.4, trend: 'up' as const },
-    icon: <Package className="h-6 w-6" />,
-  },
-  {
-    title: 'Recent Movements',
-    value: 847,
-    change: { value: 15.3, trend: 'up' as const },
-    icon: <ArrowLeftRight className="h-6 w-6" />,
-  },
-];
+import { useDashboard } from '@/hooks/useDashboard';
 
 export default function Dashboard() {
+  const { stats, loading, error } = useDashboard();
+
+  const kpiData = [
+    {
+      title: 'Total Warehouses',
+      value: stats?.total_warehouses ?? 0,
+      change: { value: 0, trend: 'up' as const },
+      icon: <Warehouse className="h-6 w-6" />,
+    },
+    {
+      title: 'Low Stock Alerts',
+      value: stats?.low_stock_alerts ?? 0,
+      change: { value: 0, trend: 'down' as const },
+      icon: <AlertTriangle className="h-6 w-6" />,
+    },
+    {
+      title: 'Total Inventory Items',
+      value: stats?.total_inventory_items ?? 0,
+      change: { value: 0, trend: 'up' as const },
+      icon: <Package className="h-6 w-6" />,
+    },
+    {
+      title: 'Recent Movements',
+      value: stats?.recent_movements ?? 0,
+      change: { value: 0, trend: 'up' as const },
+      icon: <ArrowLeftRight className="h-6 w-6" />,
+    },
+  ];
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
+            <p className="text-muted-foreground">Failed to load dashboard data</p>
+            <p className="text-sm text-destructive mt-2">{error}</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
       <div className="space-y-8">

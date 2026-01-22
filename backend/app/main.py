@@ -4,8 +4,8 @@ from contextlib import asynccontextmanager
 import logging
 
 from app.config import settings
-from app.databse import db
-from app.api import warehouse, inventory
+from app.database import db
+from app.api import warehouses, inventory
 
 # Configure logging
 logging.basicConfig(
@@ -39,17 +39,17 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS middleware
+# CORS middleware - Allow frontend to connect
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=settings.cors_origins_list,  # Your Lovable app URL
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, PUT, DELETE)
+    allow_headers=["*"],  # Allow all headers
 )
 
 # Include routers
-app.include_router(warehouse.router, prefix=settings.API_V1_PREFIX)
+app.include_router(warehouses.router, prefix=settings.API_V1_PREFIX)
 app.include_router(inventory.router, prefix=settings.API_V1_PREFIX)
 
 
