@@ -447,8 +447,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Navdeep Singh**
 
-- GitHub: [@navdeepsingh](https://github.com/navdeepsingh)
-- LinkedIn: [navdeepsingh](https://linkedin.com/in/navdeepsingh)
+- GitHub: [@Nav0711](https://github.com/nav0711)
+- LinkedIn: [Navdeep_Singh](https://linkedin.com/in/navdeepsingh0711)
+
+**Vansh Tyagi**
+
+- GitHub: [@Vansh619-beep](https://github.com/Vansh619-beep)
+- LinkedIn: [Vansh_Tyagi](https://www.linkedin.com/in/vansh-tyagi-360057323/)
 
 ---
 
@@ -464,7 +469,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For questions or support, please:
 - Open an issue on GitHub
-- Contact: navdeep@example.com
+- Contact: navdeep112005@gmail.com
 
 ---
 
