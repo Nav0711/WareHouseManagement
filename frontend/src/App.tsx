@@ -14,29 +14,50 @@ import Alerts from "./pages/Alerts";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import Auth from "./pages/Auth";
+import ChatDrawer from "./components/chat/ChatDrawer";
+
 const queryClient = new QueryClient();
+
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+  
+  if (isLoading) return <div className="h-screen w-screen flex items-center justify-center">Loading...</div>;
+  if (!isAuthenticated) return <Auth />;
+  
+  return (
+    <>
+      {children}
+      <ChatDrawer />
+    </>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/warehouses" element={<Warehouses />} />
-            <Route path="/zones" element={<Zones />} />
-            <Route path="/inventory" element={<Inventory />} />
-            <Route path="/movements" element={<Movements />} />
-            <Route path="/alerts" element={<Alerts />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/" element={<Landing />} />
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/warehouses" element={<ProtectedRoute><Warehouses /></ProtectedRoute>} />
+              <Route path="/zones" element={<ProtectedRoute><Zones /></ProtectedRoute>} />
+              <Route path="/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
+              <Route path="/movements" element={<ProtectedRoute><Movements /></ProtectedRoute>} />
+              <Route path="/alerts" element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </ThemeProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

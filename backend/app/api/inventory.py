@@ -51,6 +51,40 @@ async def get_specific_inventory(
         )
     return inventory
 
+@router.put("/{warehouse_id}/{product_id}")
+async def update_inventory(
+    warehouse_id: int,
+    product_id: int,
+    quantity: int,
+    repo: InventoryRepository = Depends(get_inventory_repo)
+):
+    """Update inventory quantity manually"""
+    try:
+        await repo.db.execute(
+            "UPDATE inventory SET quantity = $1, last_updated = CURRENT_TIMESTAMP WHERE warehouse_id = $2 AND product_id = $3",
+            quantity, warehouse_id, product_id
+        )
+        return {"status": "success", "message": "Inventory updated"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.delete("/{warehouse_id}/{product_id}")
+async def delete_inventory(
+    warehouse_id: int,
+    product_id: int,
+    repo: InventoryRepository = Depends(get_inventory_repo)
+):
+    """Remove inventory record completely"""
+    try:
+        await repo.db.execute(
+            "DELETE FROM inventory WHERE warehouse_id = $1 AND product_id = $2",
+            warehouse_id, product_id
+        )
+        return {"status": "success", "message": "Inventory deleted"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
 
 # ========== Stock Movement Endpoints ==========
 

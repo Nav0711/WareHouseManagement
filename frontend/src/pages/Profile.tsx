@@ -1,49 +1,52 @@
-import { Mail, Phone, Building2, Shield, Calendar, Edit } from 'lucide-react';
+import { Mail, Building2, Package, LogOut, Edit, Box } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
-
-const profileData = {
-  name: 'Alex Thompson',
-  email: 'alex.thompson@company.com',
-  phone: '+1 (555) 123-4567',
-  role: 'Operations Manager',
-  department: 'Supply Chain',
-  joinDate: 'March 2022',
-  avatar: '',
-  permissions: ['View Inventory', 'Manage Warehouses', 'Create Movements', 'View Reports', 'Manage Alerts'],
-  recentActivity: [
-    { action: 'Created inbound movement', target: 'Widget Pro Max - 500 units', time: '2 hours ago' },
-    { action: 'Updated warehouse capacity', target: 'Central Hub', time: '5 hours ago' },
-    { action: 'Resolved stock alert', target: 'Safety Equipment - SE-508', time: '1 day ago' },
-    { action: 'Added new zone', target: 'Zone D - Returns', time: '2 days ago' },
-  ],
-};
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function Profile() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  if (!user) return null;
+
+  const handleLogout = () => {
+    logout();
+    navigate('/auth');
+  };
+
+  const initials = user.full_name?.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase() || 'U';
+
   return (
     <DashboardLayout>
       <div className="max-w-4xl space-y-8">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">Profile</h1>
+          <Button variant="destructive" onClick={handleLogout} className="gap-2">
+            <LogOut className="h-4 w-4" />
+            Logout
+          </Button>
+        </div>
+        
         {/* Profile Header */}
         <div className="animate-slide-up opacity-0" style={{ animationDelay: '0.1s' }}>
           <div className="rounded-xl border border-border bg-card p-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
               <Avatar className="h-24 w-24 ring-4 ring-primary/20">
-                <AvatarImage src={profileData.avatar} />
                 <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
-                  {profileData.name.split(' ').map(n => n[0]).join('')}
+                  {initials}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
-                  <h1 className="text-2xl font-bold">{profileData.name}</h1>
-                  <Badge className="w-fit bg-primary/10 text-primary border-primary/20">
-                    {profileData.role}
+                  <h2 className="text-2xl font-bold">{user.full_name}</h2>
+                  <Badge className="w-fit bg-primary/10 text-primary border-primary/20 capitalize">
+                    {user.role_type || 'User'}
                   </Badge>
                 </div>
-                <p className="text-muted-foreground">{profileData.department}</p>
+                <p className="text-muted-foreground">{user.company_name || 'No company specified'}</p>
               </div>
               <Button variant="outline" className="gap-2">
                 <Edit className="h-4 w-4" />
@@ -56,7 +59,7 @@ export default function Profile() {
         {/* Contact & Info */}
         <div className="grid gap-6 md:grid-cols-2">
           <div className="rounded-xl border border-border bg-card p-6 animate-slide-up opacity-0" style={{ animationDelay: '0.2s' }}>
-            <h2 className="text-lg font-semibold mb-4">Contact Information</h2>
+            <h2 className="text-lg font-semibold mb-4">Account Information</h2>
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
@@ -64,16 +67,7 @@ export default function Profile() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Email</p>
-                  <p className="font-medium">{profileData.email}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                  <Phone className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Phone</p>
-                  <p className="font-medium">{profileData.phone}</p>
+                  <p className="font-medium">{user.email}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -81,17 +75,8 @@ export default function Profile() {
                   <Building2 className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Department</p>
-                  <p className="font-medium">{profileData.department}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                  <Calendar className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Member Since</p>
-                  <p className="font-medium">{profileData.joinDate}</p>
+                  <p className="text-sm text-muted-foreground">Company</p>
+                  <p className="font-medium">{user.company_name || 'Not set'}</p>
                 </div>
               </div>
             </div>
@@ -99,41 +84,18 @@ export default function Profile() {
 
           <div className="rounded-xl border border-border bg-card p-6 animate-slide-up opacity-0" style={{ animationDelay: '0.3s' }}>
             <div className="flex items-center gap-2 mb-4">
-              <Shield className="h-5 w-5 text-primary" />
-              <h2 className="text-lg font-semibold">Permissions</h2>
+              <Package className="h-5 w-5 text-primary" />
+              <h2 className="text-lg font-semibold">Inventory Preferences</h2>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {profileData.permissions.map((permission) => (
-                <Badge
-                  key={permission}
-                  variant="outline"
-                  className="bg-muted/50"
-                >
-                  {permission}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Recent Activity */}
-        <div className="rounded-xl border border-border bg-card p-6 animate-slide-up opacity-0" style={{ animationDelay: '0.4s' }}>
-          <h2 className="text-lg font-semibold mb-4">Recent Activity</h2>
-          <div className="space-y-4">
-            {profileData.recentActivity.map((activity, index) => (
-              <div key={index}>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="font-medium">{activity.action}</p>
-                    <p className="text-sm text-muted-foreground">{activity.target}</p>
-                  </div>
-                  <span className="text-sm text-muted-foreground">{activity.time}</span>
-                </div>
-                {index < profileData.recentActivity.length - 1 && (
-                  <Separator className="mt-4" />
-                )}
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/20">
+                <Box className="h-5 w-5 text-accent" />
               </div>
-            ))}
+              <div>
+                <p className="text-sm text-muted-foreground">Primary Focus</p>
+                <p className="font-medium capitalize">{user.inventory_focus || 'Not set'}</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

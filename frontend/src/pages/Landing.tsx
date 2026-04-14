@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Warehouse, Package, TrendingUp, Shield, Zap, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { useAuth } from '@/contexts/AuthContext';
 
 const features = [
   {
@@ -37,6 +38,8 @@ const features = [
 ];
 
 export default function Landing() {
+  const { isAuthenticated } = useAuth();
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -50,9 +53,9 @@ export default function Landing() {
           </div>
           <div className="flex items-center gap-4">
             <ThemeToggle />
-            <Link to="/dashboard">
+            <Link to={isAuthenticated ? "/dashboard" : "/auth"}>
               <Button className="gap-2 transition-all duration-300 hover:shadow-glow">
-                Go to Dashboard
+                {isAuthenticated ? "Go to Dashboard" : "Sign In"}
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
@@ -87,9 +90,9 @@ export default function Landing() {
           </p>
           
           <div className="animate-slide-up opacity-0 flex flex-col sm:flex-row items-center justify-center gap-4" style={{ animationDelay: '0.4s' }}>
-            <Link to="/dashboard">
+            <Link to={isAuthenticated ? "/dashboard" : "/auth"}>
               <Button size="lg" className="gap-2 text-base px-8 transition-all duration-300 hover:shadow-glow-lg hover:scale-105">
-                Start Managing
+                {isAuthenticated ? "Go to Dashboard" : "Get Started"}
                 <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
@@ -138,9 +141,9 @@ export default function Landing() {
               <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
                 Join thousands of operations teams already using WTMS to streamline their warehouse management.
               </p>
-              <Link to="/dashboard">
+              <Link to={isAuthenticated ? "/dashboard" : "/auth"}>
                 <Button size="lg" className="gap-2 transition-all duration-300 hover:shadow-glow-lg">
-                  Access Dashboard
+                  {isAuthenticated ? "Access Dashboard" : "Sign Up Now"}
                   <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>

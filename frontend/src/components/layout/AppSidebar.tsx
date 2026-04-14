@@ -10,9 +10,12 @@ import {
   User,
   ChevronLeft,
   ChevronRight,
+  LogOut
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
 
 const navItems = [
   { title: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
@@ -27,6 +30,7 @@ const navItems = [
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const { user, logout } = useAuth();
 
   return (
     <aside
@@ -82,11 +86,27 @@ export function AppSidebar() {
           })}
         </nav>
 
-        {/* Theme Toggle */}
-        <div className="border-t border-border p-4">
-          <div className={cn('flex items-center', collapsed ? 'justify-center' : 'justify-between')}>
-            {!collapsed && <span className="text-sm text-muted-foreground">Theme</span>}
+        {/* User and Theme */}
+        <div className="border-t border-border p-4 space-y-4">
+          {!collapsed && user && (
+             <div className="flex items-center gap-3">
+               <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                 <span className="text-primary font-semibold text-sm">
+                   {user.full_name?.charAt(0).toUpperCase() || 'U'}
+                 </span>
+               </div>
+               <div className="flex-1 overflow-hidden">
+                 <p className="text-sm font-medium truncate">{user.full_name}</p>
+                 <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+               </div>
+             </div>
+          )}
+
+          <div className={cn('flex items-center', collapsed ? 'flex-col gap-4' : 'justify-between')}>
             <ThemeToggle />
+            <Button variant="ghost" size="icon" onClick={logout} title="Logout" className="text-muted-foreground hover:text-destructive">
+              <LogOut className="h-5 w-5" />
+            </Button>
           </div>
         </div>
       </div>
