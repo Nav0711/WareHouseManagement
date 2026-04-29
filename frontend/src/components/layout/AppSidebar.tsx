@@ -10,7 +10,10 @@ import {
   User,
   ChevronLeft,
   ChevronRight,
-  LogOut
+  LogOut,
+  ShoppingCart,
+  Truck,
+  Map
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -23,6 +26,9 @@ const navItems = [
   { title: 'Zones & Bins', path: '/zones', icon: Boxes },
   { title: 'Inventory', path: '/inventory', icon: Package },
   { title: 'Stock Movements', path: '/movements', icon: ArrowLeftRight },
+  { title: 'Orders', path: '/orders', icon: ShoppingCart },
+  { title: 'Transportation', path: '/transportation', icon: Truck },
+  { title: 'Shipments', path: '/shipments', icon: Map },
   { title: 'Alerts', path: '/alerts', icon: AlertTriangle },
   { title: 'Profile', path: '/profile', icon: User },
 ];

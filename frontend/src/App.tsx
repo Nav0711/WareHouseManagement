@@ -13,6 +13,9 @@ import Movements from "./pages/Movements";
 import Alerts from "./pages/Alerts";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import Orders from "./pages/Orders";
+import Transportation from "./pages/Transportation";
+import Shipments from "./pages/Shipments";
 
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Auth from "./pages/Auth";
@@ -51,6 +54,9 @@ const App = () => (
               <Route path="/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
               <Route path="/movements" element={<ProtectedRoute><Movements /></ProtectedRoute>} />
               <Route path="/alerts" element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
+              <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+              <Route path="/transportation" element={<ProtectedRoute><Transportation /></ProtectedRoute>} />
+              <Route path="/shipments" element={<ProtectedRoute><Shipments /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>

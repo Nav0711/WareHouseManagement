@@ -5,7 +5,7 @@ import logging
 
 from app.config import settings
 from app.database import db
-from app.api import warehouses, inventory, auth, chat
+from app.api import warehouses, inventory, auth, chat, orders, transportation
 
 # Configure logging
 logging.basicConfig(
@@ -53,6 +53,8 @@ app.include_router(warehouses.router, prefix=settings.API_V1_PREFIX)
 app.include_router(inventory.router, prefix=settings.API_V1_PREFIX)
 app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
 app.include_router(chat.router, prefix=settings.API_V1_PREFIX)
+app.include_router(orders.router, prefix=settings.API_V1_PREFIX)
+app.include_router(transportation.router, prefix=settings.API_V1_PREFIX)
 
 
 @app.get("/")
